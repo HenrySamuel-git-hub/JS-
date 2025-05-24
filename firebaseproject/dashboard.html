@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+  <style>
+    /* Reset and basics */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f7fa;
+      color: #222;
+    }
+
+    /* Buttons styling */
+    button {
+      color:black;
+      border: black solid 1px;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background-color:rgba(0, 0, 0, 0.864);
+      color:white;
+      border: 1px solid black;
+    }
+
+    /* Loader dots container */
+    #load {
+      display: none;
+      justify-content: center;  
+      align-items: center;
+      height: 100vh;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 100;
+    }
+
+    #dots-container {
+      display: flex;
+      gap: 10px;
+    }
+
+    .dot {
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background-color: #b3d4fc;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    .dot:nth-child(1) {
+      animation-delay: -0.3s;
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: -0.1s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: 0.1s;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.8);
+        background-color: #b3d4fc;
+        box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
+      }
+
+      50% {
+        transform: scale(1.2);
+        background-color: #6793fb;
+        box-shadow: 0 0 0 10px rgba(178, 212, 252, 0);
+      }
+
+      100% {
+        transform: scale(0.8);
+        background-color: #b3d4fc;
+        box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
+      }
+    }
+
+    /* Header bar */
+    #style {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      flex-wrap: wrap;
+    }
+
+    /* Left nav + logo */
+    #style2 {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    #img1 {
+      height: 40px;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+
+    #style2 button {
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.5rem 1.2rem;
+    }
+
+    /* Logout button */
+    #logout {
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.5rem 1.5rem;
+      background-color: #c0392b;
+      transition: background-color 0.3s;
+    }
+
+    #logout:hover {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+    }
+
+    /* Welcome message */
+    #dealername {
+      margin: 2rem 5% 1rem 5%;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    /* Main action buttons container */
+    .action-buttons {
+      display: flex;
+      gap: 1.5rem;
+      padding: 0 5%;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    /* Style for action buttons - smaller and lighter */
+    .action-buttons button {
+      flex: 1 1 140px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+      background-color: #f0f0f0;
+      color: #111;
+      border: 1px solid #ccc;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+      cursor: pointer;
+    }
+
+    .action-buttons button:hover {
+      background-color: #ddd;
+      color: #000;
+      border-color: #999;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      #style2 {
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .action-buttons button {
+        width: 100%;
+        flex: none;
+      }
+    }
+
+    #productlistcontainer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      padding: 30px;
+      background-color: #f1f3f6;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      justify-content: center;
+    }
+
+    .product-card {
+      width: 360px;
+      background-color: #fff;
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-image-container {
+      background-color: #f7f7f7;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      height: 220px;
+      /* Set fixed height for uniformity */
+    }
+
+    .product-img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    .product-content {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .product-title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin: 0;
+      color: #111;
+      text-transform: capitalize;
+    }
+
+    .product-subtext {
+      color: #666;
+      font-size: 0.9rem;
+      margin: 10px 0 20px;
+      line-height: 1.5;
+      min-height: 60px;
+    }
+
+    .product-specs {
+      display: flex;
+      justify-content: space-between;
+      text-align: center;
+      border-top: 1px solid #eee;
+      padding-top: 16px;
+    }
+
+    .spec-item {
+      flex: 1;
+    }
+
+    .spec-value {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #111;
+      display: block;
+    }
+
+    .spec-label {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .footer-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-info h3 {
+            font-weight: 600;
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .footer-info p {
+            color: #dcdcdc;
+            font-size: 0.9rem;
+            max-width: 300px;
+        }
+        .car-footer {
+            background-color: #111;
+            color: #f5f5f0;
+            padding: 20px 0;
+            font-family: Arial, sans-serif;
+        }
+
+
+        .footer-social {
+            flex: 1;
+            min-width: 200px;
+            text-align: right;
+        }
+
+        .social-title {
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .social-icons {
+            display: inline-flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            color: #f5f5f0;
+            text-decoration: none;
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-link:hover {
+            color: #ddd;
+            /* lighter cream on hover */
+        }
+
+        .footer-copy {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #bbb;
+        }
+
+    .product-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 10px 0;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .edit-btn,
+    .delete-btn {
+      background-color:white;
+      color:black;
+      border: black solid 1px;
+    }
+
+    .edit-btn:hover,
+    .delete-btn:hover {
+      background-color:lightslategray;
+            color: white;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+    crossorigin="anonymous"></script>
+  <div id="style">
+    <div id="style2">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQXf2HSJ2YCjjnZyHJqw2iKYzkHx7oU6-6Cg&s" id="img1"
+        alt="Logo">
+      <button>Home</button>
+      <button>About</button>
+      <button>Contact</button>
+    </div>
+    <button id="logout">Logout</button>
+  </div>
+
+  <h1 id="dealername">Welcome</h1>
+  <br><br>
+  <div class="action-buttons">
+    <button id="addnew">Add New Porsche</button>
+    <button id="mygarage">Your Garage</button>
+  </div>
+  <div id="productListContainer"></div>
+
+
+  <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="" id="addProductModalFormDetails">
+            <div class="mb-3">
+              <label class="form-label">CarImageUrl:-</label>
+              <input type="text" class="form-control" id="productImg" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">PorscheModel:-</label>
+              <input type="text" class="form-control" id="productName" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              <textarea id="description"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Top Speed</label>
+              <input type="" class="form-control" id="speed" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Price</label>
+              <input type="number" class="form-control" id="price" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Category</label>
+              <select class="form-control" id="category" required>
+                <option value="">choose yr ModelCategory:--</option>
+                <option value="Macan">Macan </option>
+                <option value="Panamera">Panamera</option>
+                <option value="Cayenne">Cayenne</option>
+                <option value="718GTR">718GTR</option>
+              </select>
+            </div>
+
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" form="devForm" class="btn btn-primary" id="submitAddProductForm">Submit</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="load">
+    <section id="dots-container">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </section>
+  </div>
+  <div id="productlistcontainer"></div>
+     <footer class="car-footer">
+        <div class="footer-container">
+            <div class="footer-info">
+                <h3>Porsche Motors</h3>
+                <p>Precision engineering. Iconic performance."</p>
+            </div>
+            <div class="footer-social">
+                <div class="social-title">Follow Us</div>
+                <div class="social-icons">
+                    <a href=" https://www.linkedin.com/in/henry-samuel-07821828b" aria-label="LinkedIn" title="LinkedIn"
+                        class="social-link linkedin">
+                        <svg fill="currentColor" height="24" width="24" viewBox="0 0 24 24">
+                            <path
+                                d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.21 8h4.57v12H.21V8zm7.32 0h4.38v1.72h.06c.61-1.16 2.11-2.38 4.34-2.38 4.64 0 5.5 3.05 5.5 7v7.68h-4.57v-6.82c0-1.62-.03-3.7-2.26-3.7-2.27 0-2.62 1.78-2.62 3.62v6.9H7.53V8z" />
+                        </svg>
+                    </a>
+                    <a href="https://x.com/porsche/" aria-label="Twitter" title="Twitter" class="social-link twitter">
+                        <svg fill="currentColor" height="24" width="24" viewBox="0 0 24 24">
+                            <path
+                                d="M23 3a10.9 10.9 0 01-3.14.86 4.48 4.48 0 001.96-2.48 9.14 9.14 0 01-2.89 1.1A4.52 4.52 0 0016.15 2c-2.54 0-4.6 2.1-4.6 4.7 0 .37.04.74.12 1.1-3.8-.2-7.17-2.1-9.42-5a4.71 4.71 0 00-.62 2.37 4.7 4.7 0 002.05 3.95 4.4 4.4 0 01-2.1-.6v.05c0 2.28 1.6 4.2 3.7 4.62a4.5 4.5 0 01-2.1.08 4.5 4.5 0 004.2 3.3A9 9 0 012 19.54 12.8 12.8 0 008.29 21c7.55 0 11.67-6.25 11.67-11.66 0-.17-.01-.34-.02-.5A8.18 8.18 0 0023 3z" />
+                        </svg>
+                    </a>
+                    <a href="https://www.instagram.com/porsche/" aria-label="Instagram" title="Instagram"
+                        class="social-link instagram">
+                        <svg fill="currentColor" height="24" width="24" viewBox="0 0 24 24">
+                            <path
+                                d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 2A3.75 3.75 0 004 7.75v8.5A3.75 3.75 0 007.75 20h8.5a3.75 3.75 0 003.75-3.75v-8.5A3.75 3.75 0 0016.25 4h-8.5zm8.75 2a1 1 0 110 2 1 1 0 010-2zM12 7a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copy">
+            &copy;2025 Henry Samuel. All rights reserved.
+        </div>
+    </footer>
+
+  <script type="module">
+  import { doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+  import { db } from "./fbConfig.js";
+  import { signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    let showmodal;
+    let editIndex = -1;
+    let loggedindealer = JSON.parse(localStorage.getItem("dealer credentials"));
+    let dealername = document.getElementById("dealername");
+    dealername.innerHTML = `Welcome "${loggedindealer?.nameDealer || 'Guest'}"`;
+
+    document.getElementById("addnew").addEventListener("click", () => {
+      let addProductModal = document.getElementById("addProductModal");
+      showmodal = new bootstrap.Modal(addProductModal);
+      showmodal.show();
+    });
+
+    document.getElementById("submitAddProductForm").addEventListener("click", async () => {
+      let Cname = document.getElementById("productName").value;
+      let CImg = document.getElementById("productImg").value;
+      let CPrice = document.getElementById("price").value;
+      let Cspeed = document.getElementById("speed").value;
+      let CCategory = document.getElementById("category").value;
+      let CDescription = document.getElementById("description").value;
+      if (!Cname || !CImg) {
+        alert("Please enter at least product name and image URL.");
+        return;
+      }
+      const newProduct = {
+        Cname, CImg, CPrice, Cspeed, CCategory, CDescription
+      };
+
+      const docRef = doc(db, "dealers", loggedindealer.nameDealer);
+      const loader = document.getElementById("load");
+
+      try {
+        // Get current products from Firestore
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) {
+          alert("Dealer document not found.");
+          return;
+        }
+
+        let products = docSnap.data().products || [];
+
+        if (editIndex === -1) {
+          // Adding new product - no confirmation or loader needed
+          products.push(newProduct);
+
+          await updateDoc(docRef, { products });
+
+          alert("Your Porsche has been added");
+
+          localStorage.setItem("productslist", JSON.stringify(products));
+          renderproducts(products);
+
+          showmodal.hide();
+          clearModalForm();
+
+        } else {
+          // Editing product - add confirmation and loader
+          const confirmed = confirm("Are you sure you want to update this Porsche in your garage?");
+          if (!confirmed) return;
+          showmodal.hide();
+          loader.style.display = "flex";
+
+          setTimeout(async () => {
+            try {
+              products[editIndex] = newProduct;
+
+              await updateDoc(docRef, { products });
+
+              alert("Your Porsche has been updated");
+
+              localStorage.setItem("productslist", JSON.stringify(products));
+              renderproducts(products);
+
+              showmodal.hide();
+              clearModalForm();
+              editIndex = -1;
+
+            } catch (error) {
+              console.error(error);
+              alert("Failed to update products. Please try again.");
+            } finally {
+              loader.style.display = "none";
+            }
+          }, 2000);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Failed to update products. Please try again.");
+      }
+    });
+
+    document.getElementById("logout").addEventListener("click", () => {
+      const loader = document.getElementById("load");
+      loader.style.display = "flex";
+      setTimeout(() => {
+        localStorage.removeItem("dealercredentials");
+        location.href = "./login.html";
+      }, 2000);
+    });
+
+    let garageVisible = false;
+    const productlistcontainer = document.getElementById("productlistcontainer");
+
+    document.getElementById("mygarage").addEventListener("click", async () => {
+      if (garageVisible) {
+        productlistcontainer.innerHTML = "";
+        garageVisible = false;
+        return;
+      }
+      const dealerdocref = doc(db, "dealers", loggedindealer.nameDealer);
+      const dealerdocfinaldraft = await getDoc(dealerdocref);
+
+      if (dealerdocfinaldraft.exists()) {
+        const products = dealerdocfinaldraft.data();
+        const finalproducts = products.products || [];
+        localStorage.setItem("productslist", JSON.stringify(finalproducts));
+        if (Array.isArray(finalproducts) && finalproducts.length > 0) {
+          renderproducts(finalproducts);
+          garageVisible = true;
+        } else {
+          alert("No vehicles added or 'vehicles' field is missing");
+        }
+      }
+    });
+
+    function renderproducts(productsArray) {
+      productlistcontainer.innerHTML = "";
+
+      productsArray.forEach((product, index) => {
+        let productcard = document.createElement("div");
+        productcard.classList.add("product-card");
+
+        productcard.innerHTML = `
+          <div class="product-image-container">
+            <img src="${product.CImg}" alt="${product.Cname}" class="product-img" />
+          </div>
+          <div class="product-content">
+            <h2 class="product-title">${product.Cname}</h2>
+            <p class="product-subtext">${product.CDescription}</p>
+
+            <div class="product-specs">
+              <div class="spec-item">
+                <span class="spec-value">${product.Cspeed}</span>
+                <span class="spec-label">Top Speed</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-value">₹${product.CPrice}</span>
+                <span class="spec-label">Price</span>
+              </div>
+            </div>
+            <div class="product-actions">
+              <button class="action-btn edit-btn" data-index="${index}">Edit</button>
+              <button class="action-btn delete-btn" data-index="${index}">Delete</button>
+            </div>
+          </div>
+        `;
+        productlistcontainer.appendChild(productcard);
+      });
+    }
+
+    productlistcontainer.addEventListener('click', async (e) => {
+      const target = e.target;
+      if (target.classList.contains('delete-btn')) {
+        const index = parseInt(e.target.getAttribute('data-index'));
+        const confirmed = confirm('Are you sure you want to delete this Porsche from your garage?');
+
+        if (!confirmed) return;
+        const loader = document.getElementById('load');
+        loader.style.display = 'flex';
+
+        setTimeout(async () => {
+          loader.style.display = 'none';
+
+          let products = JSON.parse(localStorage.getItem('productslist')) || [];
+          if (index >= 0 && index < products.length) {
+            const removedProduct = products.splice(index, 1)[0];
+
+            localStorage.setItem('productslist', JSON.stringify(products));
+
+            try {
+              const docRef = doc(db, 'dealers', loggedindealer.nameDealer);
+              const docSnap = await getDoc(docRef);
+              if (docSnap.exists()) {
+                let firestoreProducts = docSnap.data().products || [];
+
+                firestoreProducts = firestoreProducts.filter(p => !(
+                  p.Cname === removedProduct.Cname &&
+                  p.CImg === removedProduct.CImg &&
+                  p.CPrice === removedProduct.CPrice &&
+                  p.Cspeed === removedProduct.Cspeed &&
+                  p.CCategory === removedProduct.CCategory &&
+                  p.CDescription === removedProduct.CDescription
+                ));
+
+                await updateDoc(docRef, { products: firestoreProducts });
+
+                renderproducts(products);
+              }
+            } catch (error) {
+              console.error('Error updating Firestore:', error);
+              alert('Failed to update your garage. Please try again.');
+
+              renderproducts(products);
+            }
+          }
+        }, 2000);
+      }
+      if (target.classList.contains('edit-btn')) {
+        const index = parseInt(target.getAttribute('data-index'));
+        let products = JSON.parse(localStorage.getItem('productslist')) || [];
+        if (index >= 0 && index < products.length) {
+          editIndex = index;
+          fillModalForm(products[index]);
+          let addProductModal = document.getElementById("addProductModal");
+          showmodal = new bootstrap.Modal(addProductModal);
+          showmodal.show();
+        }
+      }
+    });
+
+    function clearModalForm() {
+      document.getElementById("productName").value = "";
+      document.getElementById("productImg").value = "";
+      document.getElementById("price").value = "";
+      document.getElementById("speed").value = "";
+      document.getElementById("category").value = "";
+      document.getElementById("description").value = "";
+    }
+
+    function fillModalForm(product) {
+      document.getElementById("productName").value = product.Cname || "";
+      document.getElementById("productImg").value = product.CImg || "";
+      document.getElementById("price").value = product.CPrice || "";
+      document.getElementById("speed").value = product.Cspeed || "";
+      document.getElementById("category").value = product.CCategory || "";
+      document.getElementById("description").value = product.CDescription || "";
+    }
+
+  });
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Customer Login Page</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Page</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-image: url('https://images-porsche.imgix.net/-/media/3e286c7c14804e84834c139ab4d1505d_04261333660d4e8cb2fca92cc16e8e4d_YAAAA1-a93e4236-b137-11ee-8112-005056bbdc38');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        min-height: 100vh; /* Changed from height to min-height */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+    .form {
+      background-color: rgba(255, 255, 255, 0.6);
+      padding: 2rem;
+      max-width: 350px;
+      width: 100%;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      text-align: center;
+      color: #222;
+    }
+
+    .input-container {
+      margin-bottom: 1rem;
+    }
+
+    .input-container input,
+    #role {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      font-size: 0.9rem;
+    }
+
+    #submit {
+      width: 100%;
+      background-color: black;
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      text-transform: uppercase;
+    }
+
+    #submit:hover {
+      background-color: white;
+      color: black;
+      border: 1px solid black;
+    }
+
+    .signup-link {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #555;
+    }
+
+    .signup-link a {
+      text-decoration: underline;
+      color: #000;
+    }
+
+    #load {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100%;
+    }
+
+    #dots-container {
+      display: flex;
+      gap: 10px;
+    }
+
+    .dot {
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background-color: #b3d4fc;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    .dot:nth-child(1) { animation-delay: -0.3s; }
+    .dot:nth-child(2) { animation-delay: -0.1s; }
+    .dot:nth-child(3) { animation-delay: 0.1s; }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.8);
+        background-color: #b3d4fc;
+        box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
+      }
+
+      50% {
+        transform: scale(1.2);
+        background-color: #6793fb;
+        box-shadow: 0 0 0 10px rgba(178, 212, 252, 0);
+      }
+
+      100% {
+        transform: scale(0.8);
+        background-color: #b3d4fc;
+        box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
+      }
+    }
+  </style>
+</head>
+<body>
+  <form class="form" id="loginForm">
+    <p class="form-title">Sign in to your account</p>
+    <div class="input-container">
+      <input type="email" id="email" placeholder="Enter email" />
+    </div>
+    <div class="input-container">
+      <input type="password" id="password" placeholder="Enter password" />
+    </div>
+    <div class="input-container">
+      <select id="role">
+        <option>--------Select--------</option>
+        <option value="dealer">Dealer</option>
+        <option value="customer">Customer</option>
+      </select>
+    </div>
+    <button type="submit" id="submit">Sign in</button>
+    <p class="signup-link">No account? <a href="./signup.html">Sign up</a></p>
+  </form>
+
+  <div id="load">
+    <section id="dots-container">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </section>
+  </div>
+
+  <script type="module">
+    import { authentication } from "./fbconfig.js";
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const loginForm = document.getElementById("loginForm");
+      const loader = document.getElementById("load");
+
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const role = document.getElementById("role").value;
+
+        if (!email || !password || role === "") {
+          alert("Please fill in all fields before logging in.");
+          return;
+        }
+
+        loginForm.style.display = "none";
+        loader.style.display = "flex";
+
+        setTimeout(async () => {
+          try {
+            await signInWithEmailAndPassword(authentication, email, password);
+            if (role === "customer") {
+              window.location.href = "./index.html";
+            } else {
+              window.location.href = "./dashboard.html";
+            }
+          } catch (error) {
+            loader.style.display = "none";
+            loginForm.style.display = "block";
+            alert(`Login failed: ${error.message}`);
+          }
+        }, 2000);
+      });
+    });
+  </script>
+</body>
+</html>

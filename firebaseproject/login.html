@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dealer Login Page</title>
+        <style>
+body{
+    background-image: url("https://i.pinimg.com/736x/8c/98/99/8c98994518b575bfd8c949e91d20548b.jpg");
+}
+            /* From Uiverse.io by nathann09 */ 
+.form {
+    background-color: #fff;
+    display: block;
+    padding: 1rem;
+    max-width: 350px;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 150px;
+  }
+  
+  .form-title {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 600;
+    text-align: center;
+    color: #000;
+  }
+  
+  .input-container {
+    position: relative;
+  }
+  
+  .input-container input, .form button {
+    outline: none;
+    border: 1px solid #e5e7eb;
+    margin: 8px 0;
+  }
+  #role{
+    position: relative;
+  }
+  #role{
+    outline: none;
+    border: 1px solid #e5e7eb;
+    margin: 8px 0;
+  }
+  #role{
+    background-color: #fff;
+    padding: 1rem;
+    padding-right: 3rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    width: 300px;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+  
+  .input-container input {
+    background-color: #fff;
+    padding: 1rem;
+    padding-right: 3rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    width: 300px;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+  
+  #submit {
+    display: block;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    background-color:black;
+    color:white;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    width: 100%;
+    border-radius: 0.5rem;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  #submit:hover{
+    background-color:white;
+    color:black;
+  }
+  
+  .signup-link {
+    color: #6B7280;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    text-align: center;
+  }
+  
+  .signup-link a {
+    text-decoration: underline;
+  }
+  #dots-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+.dot {
+    height: 20px;
+    width: 20px;
+    margin-right: 10px;
+    border-radius: 10px;
+    background-color: #b3d4fc;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+.dot:last-child {
+    margin-right: 0;
+}
+
+.dot:nth-child(1) {
+    animation-delay: -0.3s;
+}
+
+.dot:nth-child(2) {
+    animation-delay: -0.1s;
+}
+
+.dot:nth-child(3) {
+    animation-delay: 0.1s;
+}
+#load {
+    display: none; /* Initial state */
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.8);
+        background-color: #b3d4fc;
+        box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
+    }
+
+    50% {
+        transform: scale(1.2);
+        background-color: #6793fb;
+        box-shadow: 0 0 0 10px rgba(178, 212, 252, 0);
+    }
+
+    100% {
+        transform: scale(0.8);
+        background-color: #b3d4fc;
+        box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
+    }
+}
+        </style>
+    </head>
+    <body>
+
+        <!-- From Uiverse.io by nathann09 --> 
+        <center>
+    <form class="form" id="loginForm">
+        <p class="form-title" >Sign in to your account</p>
+         <div class="input-container">
+           <input type="email"id="email" placeholder="Enter email">
+           <span>
+           </span>
+       </div>
+       <div class="input-container" >
+           <input type="password" id="password" placeholder="Enter password">
+           <select name="" id="role">
+            <option value="">--------Select--------</option>
+            <option value="dealer">Dealer</option>
+            <option value="client">Client</option>
+        </select>
+         </div>
+          <button type="submit" id="submit">Sign in</button>
+ 
+       <p class="signup-link">
+         No account?
+         <a href="./signup.html">Sign up</a>
+       </p>
+    </form>
+</center>
+<center>
+    <div id="load">
+        <section id="dots-container">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </section>
+    </div>
+</center>
+<script type="module">
+    import { authentication,db} from "./fbconfig.js";
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+    import {doc,getDoc} from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+  
+    document.addEventListener("DOMContentLoaded", () => {
+      const loginForm = document.getElementById("loginForm");
+      const loader = document.getElementById("load");
+  
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+  
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const role = document.getElementById("role").value;
+
+        if (role !== "dealer") {
+          alert("Only dealers can log in here.");
+          return;
+      }
+  
+        if (!email || !password || role === "") {
+          alert("Please fill in all fields before logging in.");
+          return;
+        }
+  
+        loginForm.style.display = "none";
+        loader.style.display = "flex";
+  
+        setTimeout(async () => {
+          try {
+            const userCredential = await signInWithEmailAndPassword(authentication, email, password);
+            const nameDealer = userCredential.user.displayName;
+            const userDocRef = doc(db, "dealers", nameDealer);
+            const userDocSnap = await getDoc(userDocRef);
+        
+            if (userDocSnap.exists()) {
+              localStorage.setItem("dealer credentials", JSON.stringify({ email, role, nameDealer }));
+                location.href = "./dashboard.html";
+            } else {
+                alert("Dealer profile not found.");
+                loader.style.display = "none";
+                loginForm.style.display = "block";
+            }
+        } catch (error) {
+            alert("Login failed: " + error.message);
+            loader.style.display = "none";
+            loginForm.style.display = "block";
+        }
+        
+        },2000);
+      });
+    });
+  </script>
+    </body>
+</html>
